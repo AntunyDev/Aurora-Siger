@@ -1,0 +1,11 @@
+Parametro,Valor
+temperatura_interna,35.5
+temperatura_externa,80.2
+integridade_estrutural,1
+nivel_energia,85.0
+pressao_tanques,4500
+status_modulos_criticos,1
+nivel,85.0
+capacidade_total_kwh,500
+consumo_decolagem_kwh,220
+perdas_energeticas,8
