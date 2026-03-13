@@ -13,8 +13,6 @@ def limpar_terminal():
     import subprocess
     import platform
 
-    input("Pressione qualquer tecla para continuar...")
-
     sistema = platform.system()
     if sistema == "Windows":
         subprocess.run("cls", shell=True)  # Windows
@@ -101,6 +99,7 @@ def visualizar_dados_telemetria(telemetria):
 
     print(tabulate(table_data, headers=["Parâmetro", "Valor"], tablefmt="grid"))
     print("\n----------------------------\n")
+    input("Pressione Enter para continuar...")
 
 
 def atualizar_dados_telemetria_manual(telemetria):
@@ -174,6 +173,8 @@ def atualizar_dados_telemetria_manual(telemetria):
                 "Valor inválido. Por favor, insira uma grandeza numérica válida relacionada ao dado solicitado para atualizar."
             )
 
+    input("Pressione Enter para continuar...")
+
 
 def executar_analise_energetica(telemetria):
 
@@ -217,6 +218,7 @@ def executar_analise_energetica(telemetria):
             + Style.RESET_ALL
         )
     print("\n----------------------------\n")
+    input("Pressione Enter para continuar...")
 
 
 def executar_verificacao_seguranca(telemetria):
@@ -267,6 +269,7 @@ def executar_verificacao_seguranca(telemetria):
         print(Fore.RED + "STATUS FINAL: DECOLAGEM ABORTADA" + Style.RESET_ALL)
 
     print("\n---------------------------------------------\n")
+    input("Pressione Enter para continuar...")
 
 
 def gerar_relatorio_csv(telemetria):
@@ -290,6 +293,7 @@ def gerar_relatorio_csv(telemetria):
                 writer.writerow([chave, valor])
 
     print("Relatório CSV gerado com sucesso: relatorio_telemetria.csv")
+    input("Pressione Enter para continuar...")
 
 
 def consultar_analise_ia(telemetria):
@@ -331,6 +335,8 @@ def consultar_analise_ia(telemetria):
         except Exception as e2:
             print(f"Erro persistente: {e2}. Usando análise simulada.")
             analise_assistida_ia_simulada(telemetria)
+
+    input("Pressione Enter para continuar...")
 
 
 def analise_assistida_ia_simulada(telemetria):
@@ -392,3 +398,5 @@ def analise_assistida_ia_simulada(telemetria):
 
     if risco == "Alto":
         print("- Abortagem da missão recomendada até correção dos problemas")
+
+    input("Pressione Enter para continuar...")
