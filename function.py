@@ -104,76 +104,99 @@ def visualizar_dados_telemetria(telemetria):
 
 def atualizar_dados_telemetria_manual(telemetria):
 
-    while True:
+    campos = [
+        {
+            "key": "temperatura_interna",
+            "label": "Temperatura Interna",
+            "unit": "°C",
+            "min": 0,
+            "max": 100,
+        },
+        {
+            "key": "temperatura_externa",
+            "label": "Temperatura Externa",
+            "unit": "°C",
+            "min": 0,
+            "max": 150,
+        },
+        {
+            "key": "integridade_estrutural",
+            "label": "Integridade Estrutural",
+            "unit": "(0-1)",
+            "min": 0,
+            "max": 1,
+            "cast": int,
+        },
+        {
+            "key": "nivel_energia",
+            "label": "Nível de Energia",
+            "unit": "%",
+            "min": 0,
+            "max": 100,
+        },
+        {
+            "key": "pressao_tanques",
+            "label": "Pressão dos Tanques",
+            "unit": "kPa",
+            "min": 0,
+            "max": 10000,
+        },
+        {
+            "key": "status_modulos_criticos",
+            "label": "Status dos Módulos Críticos",
+            "unit": "(0-1)",
+            "min": 0,
+            "max": 1,
+            "cast": int,
+        },
+    ]
 
+    def mostrar_menu():
         print("\n======== ATUALIZAR DADOS DE TELEMETRIA MANUALMENTE ============\n")
-        print("[1] - Temperatura Interna")
-        print("[2] - Temperatura Externa")
-        print("[3] - Integridade Estrutural")
-        print("[4] - Nível de Energia")
-        print("[5] - Pressão dos Tanques")
-        print("[6] - Status dos Módulos Críticos")
-        print("[7] - Atualizar todos os dados")
+        for idx, campo in enumerate(campos, start=1):
+            valor_atual = telemetria.get(campo["key"], "N/A")
+            print(f"[{idx}] - {campo['label']} (atual: {valor_atual} {campo['unit']})")
+        print(f"[{len(campos) + 1}] - Atualizar todos os dados")
         print("[0] - Voltar")
 
-        op = input("\nEscolha o dado que deseja atualizar: ")
+    while True:
+        limpar_terminal()
+        mostrar_menu()
+        opcao = input("\nEscolha o dado que deseja atualizar: ")
 
-        try:
+        if opcao == "0":
+            return
 
-            if op == "1":
-                telemetria["temperatura_interna"] = validar_entrada(
-                    "Digite a nova temperatura interna (°C): ", 0, 100
-                )
-            elif op == "2":
-                telemetria["temperatura_externa"] = validar_entrada(
-                    "Digite a nova temperatura externa (°C): ", 0, 150
-                )
-            elif op == "3":
-                telemetria["integridade_estrutural"] = validar_entrada(
-                    "Digite a nova integridade estrutural (0-1): ", 0, 1
-                )
-            elif op == "4":
-                telemetria["nivel_energia"] = validar_entrada(
-                    "Digite o novo nível de energia (0-100): ", 0, 100
-                )
-            elif op == "5":
-                telemetria["pressao_tanques"] = validar_entrada(
-                    "Digite a nova pressão dos tanques (kPa): ", 0, 10000
-                )
-            elif op == "6":
-                telemetria["status_modulos_criticos"] = validar_entrada(
-                    "Digite o novo status dos módulos críticos (0-1): ", 0, 1
-                )
-            elif op == "7":
-                telemetria["temperatura_interna"] = validar_entrada(
-                    "Digite a nova temperatura interna (°C): ", 0, 100
-                )
-                telemetria["temperatura_externa"] = validar_entrada(
-                    "Digite a nova temperatura externa (°C): ", 0, 150
-                )
-                telemetria["integridade_estrutural"] = validar_entrada(
-                    "Digite a nova integridade estrutural (0-1): ", 0, 1
-                )
-                telemetria["nivel_energia"] = validar_entrada(
-                    "Digite o novo nível de energia (0-100): ", 0, 100
-                )
-                telemetria["pressao_tanques"] = validar_entrada(
-                    "Digite a nova pressão dos tanques (kPa): ", 0, 10000
-                )
-                telemetria["status_modulos_criticos"] = validar_entrada(
-                    "Digite o novo status dos módulos críticos (0-1): ", 0, 1
-                )
-            elif op == "0":
-                return
-            else:
-                print("Opção inválida.")
+        if opcao == str(len(campos) + 1):
+            escolhas = range(1, len(campos) + 1)
+        elif opcao.isdigit() and 1 <= int(opcao) <= len(campos):
+            escolhas = [int(opcao)]
+        else:
+            print("Opção inválida. Selecione um número válido do menu.")
+            input("\nPressione Enter para continuar...")
+            continue
 
-        except ValueError:
-            print(
-                "Valor inválido. Por favor, insira uma grandeza numérica válida relacionada ao dado solicitado para atualizar."
-            )
+        for escolha in escolhas:
+            campo = campos[escolha - 1]
+            try:
+                valor = validar_entrada(
+                    f"Digite o novo valor para {campo['label']} ({campo['unit']}): ",
+                    campo["min"],
+                    campo["max"],
+                )
+                if "cast" in campo:
+                    valor = campo["cast"](valor)
 
-    input("Pressione Enter para continuar...")
+                telemetria[campo["key"]] = valor
+                print(
+                    f"{campo['label']} atualizado para {valor} {campo['unit']} com sucesso."
+                )
+            except ValueError:
+                print(
+                    "Valor inválido. Por favor, insira um número dentro do intervalo permitido."
+                )
+
+        input("\nPressione Enter para continuar...")
 
 
 def executar_analise_energetica(telemetria):
@@ -327,13 +350,22 @@ def consultar_analise_ia(telemetria):
         print("\n===== ANÁLISE DA IA =====\n")
         print(resposta.text)
     except Exception as e:
-        print(f"Erro ao consultar IA: {e}. Tentando novamente...")
+        print(Fore.RED + "Erro ao consultar a IA:" + Style.RESET_ALL)
+        print(f"  Tipo: {type(e).__name__}")
+        print(f"  Detalhes: {e}")
+        print("  Verifique a conexão de rede e a chave de API e tente novamente.\n")
+        print("Tentando uma segunda tentativa...\n")
         try:
             resposta = model.generate_content(prompt)
             print("\n===== ANÁLISE DA IA =====\n")
             print(resposta.text)
         except Exception as e2:
-            print(f"Erro persistente: {e2}. Usando análise simulada.")
+            print(Fore.RED + "Erro persistente ao consultar a IA:" + Style.RESET_ALL)
+            print(f"  Tipo: {type(e2).__name__}")
+            print(f"  Detalhes: {e2}\n")
+            print(
+                "Devido a problemas técnicos, utilizaremos análise simulada à seguir.\n"
+            )
             analise_assistida_ia_simulada(telemetria)
 
     input("Pressione Enter para continuar...")
